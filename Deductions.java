@@ -127,4 +127,5 @@ class Deductions {
 		
 		return n;
 	}
+	public void jiji (){}
 }
