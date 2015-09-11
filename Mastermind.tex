@@ -1,0 +1,128 @@
+\documentclass[]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsthm}
+\usepackage{amsfonts}
+
+%opening
+\title{Résolution du Mastermind}
+\author{Clara Bringer, Pierre Gervais}
+
+\newtheorem{mydef}{Définition}
+\newtheorem{mythm}{Théorème}
+\newtheorem{mycoro}{Corollaire}
+
+\begin{document}
+
+\maketitle
+
+\part*{Introduction}
+
+\begin{mydef}
+	Placement : Une certaine couleur à une certaine position.
+\end{mydef}
+
+\begin{mydef}
+	$N_f \in \mathbb{N}$ désigne le nombre de fiches et $N_c \in \mathbb{N}$ le nombre de couleurs.
+\end{mydef}
+
+\part*{Raisonnements et conclusions}
+
+\section{Raisonnement ligne par ligne}
+
+\begin{mythm}
+Si sur une ligne on n'a aucun témoin noir, alors chaque couleur est une couleur impossible à sa position respective.
+\end{mythm}
+
+\begin{mythm}
+	Si sur une ligne on n'a aucun témoin, alors aucune des couleurs n'apparaît dans la solution.
+\end{mythm}
+
+\begin{mythm}[A vérifier !]
+	Si deux fiches ont les mêmes couleurs impossibles, alors elles sont dites équivalentes, c'est à dire que tester une couleur sur la première ou la seconde n'est pas plus cohérent l'un que l'autre.
+\end{mythm}
+
+\section{Raisonnement comparatif}
+
+\subsection{Comparaison avec la solution partielle}
+
+\begin{mythm}
+Soit une ligne avec $n$ placements finaux et $n$ témoins noirs, alors les autres placements de cette ligne sont impossibles.
+\end{mythm}
+
+\begin{mythm}
+On a pour une position $N_c-1$ couleurs impossibles si et seulement si la couleur restante est la couleur de ce placement.
+\end{mythm}
+
+\begin{mythm}
+Si une couleur est présente dans la solution et qu'elle est impossible à $N_f-1$ positions, c'est à dire qu'elle n'est possible qu'à une unique position, alors c'est qu'elle est la couleur du placement à cette position.
+\end{mythm}
+
+\subsection{Comparaison entre lignes}
+
+\begin{mythm}
+Soit $L_a$ une ligne contenant, entre autres, des pions de couleurs $(C_i)$.
+\\
+Soit une autre ligne $L_b$, sur laquelle \textbf{seulement} $m$ de ces pions ont été remplacés par des pions de couleurs différentes de $(C_i)$, que l'on notera $(C'_i)$, à présent en quantités $(n'_i)$ sur $L_b$. Les couleurs $(C_i)$, elles, sont en quantités $(n_i)$.
+\\Si $L_b$ possède $m$ témoins de plus, alors :
+\begin{itemize}
+	\item Les quantités $(n_i)$ majorent les quantités des couleurs $(C_i)$ de la solution.
+	\item Les quantités $(n'_i)$ minorent les quantités des couleurs $(C'_i)$ de la solution.
+\end{itemize}
+\end{mythm}
+
+\begin{proof}[Démonstration]
+	Commençons par traiter les couleurs $(C_i)$ :
+	\\
+	Par l'absurde, supposons qu'il existe un $n_i$ strictement inférieur à la quantité de couleur $C_i$ de la solution.
+	\\
+	Alors, il y a sur $L_b$ au moins un pion de couleur $C_i$ de moins que dans la solution, celui ci faisait partie des $m$ pions considérés sur $L_a$, ainsi son retrait fera qu'un des témoins de $L_a$ disparaîtra.
+	\\
+	On sait que de $L_a$ à $L_b$ il y a $m$ pions qui diffèrent, dont un de couleur $C_i$ qui était présent dans la solution, alors le nombre de nouveaux témoins de $L_a$ à $L_b$ est au plus $m - 1$.
+	\\
+	On est donc en contradiction avec l'hypothèse des $m$ témoins en plus, on a donc démontré que les quantités $(n_i)$ majorent celles des couleurs $(C_i)$ dans la solution.
+	\\
+	A présent les couleurs $(C'_i)$ :
+	\\
+	Par l'absurde, supposons qu'il existent un $n'_i$ strictement supérieur à la quantité de couleur $C'_i$ de la solution.
+	\\
+	Alors, il y a au moins un pion de couleur $C'_i$ de plus que dans la solution, celui-ci faisait partie des $m$ pions qui ont changé de $L_a$ à $L_b$ et comme il n'appartient pas à la solution, son ajout ne modifiera pas le nombre de témoins.
+	\\
+	Ainsi le nombre de nouveaux témoins est au plus $m-1$, ce qui contredit l'hypothèse des $m$ témoins en plus.
+\end{proof}
+
+\begin{mycoro}
+Si on a déjà découvert $n_i$ placements de couleur $C_i$, alors on a découvert tous les placements de cette couleur ; c'est donc une couleur impossible sur les autres fiches.
+\end{mycoro}
+
+\begin{mycoro}
+Si on a une quantité $n_i=0$, alors la couleur $C_i$ n'est pas dans la solution.
+\end{mycoro}
+
+\begin{mycoro}
+S'il existe une quantité $n'_i$ telle que l'on connaisse $N_f - n'_i$ placements finaux \textbf{de couleurs différentes de $C'_i$}, alors les placements restants sont de couleurs $C'_i$.
+\end{mycoro}
+
+\begin{mythm}
+	Soit une ligne $L_a$ et une ligne $L_b$ qui diffèrent de $n$ placements.
+	\begin{itemize}
+		\item Si on a $n$ témoins noirs de plus, alors les nouveaux placements appartiennent à la solution.
+		\item Si on a $n$ témoins noirs de moins, alors les anciens placements appartiennent à la solution.
+	\end{itemize} 
+\end{mythm}
+
+\part*{Algorithme de résolution}
+
+\paragraph*{}
+Cet algorithme exploite les théorèmes énoncés dans la partie précédente, le principe est d'évaluer à chaque pas quelle combinaison (cohérente), une fois soumise et les témoins donnés, éliminerait le plus de placements.
+\\
+On garde en mémoire les couleurs impossibles pour une certaine fiche et un encadrement des quantités finales de chaque couleur du jeu (initialement le couple $(0, N_f)$)
+\\
+Tant que l'on n'a pas trouvé la solution :\\
+	$\rightarrow$Pour chaque combinaison cohérente avec les déductions précédentes :\\
+		$\rightarrow \rightarrow$Pour chaque $N_f$-uplet de témoins possible :\\
+			$\rightarrow \rightarrow \rightarrow$Déduire à partir des déductions précédentes les placements impossibles.\\
+		$\rightarrow \rightarrow$Faire la moyenne des placements impossibles pour cette combinaison.\\
+	$\rightarrow$Soumettre la combinaison avec la moyenne la plus élevée.\\
+	$\rightarrow$En déduire les placements impossibles.\\
+
+\end{document}
